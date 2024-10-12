@@ -3,3 +3,5 @@ fastapi[standard]
 sqlalchemy
 streamlit
 llama-index-llms-ollama
+azure-storage-blob
+azure-identity
