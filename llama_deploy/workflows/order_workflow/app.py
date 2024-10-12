@@ -8,7 +8,7 @@ from llama_index.core.workflow import (
 )
 from llama_index.llms.ollama import Ollama
 from llama_index.utils.workflow import draw_all_possible_flows
-from agent import OrderAgent
+from .agent import OrderAgent
 
 order_agent_obj = OrderAgent()
 order_agent = order_agent_obj.get_agent()

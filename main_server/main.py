@@ -46,18 +46,23 @@ async def chat_llama(
         if response == "granted":
             # response, reference = session.run("docs_agent", query=query, document_id=chat.document_id)
             return ChatResponse(bot_message=query, reference=query)
+        else:
+            response = "I'm designed to help with order-related tasks and questions about user documents. Unfortunately, I can't assist with your current request. Feel free to ask me something else within those parameters."
     else:
         response = session.run("security_layer_agent", query=query)
         
         if response == "granted":
-            if chat.agent_id == "appointment_agent":
-                # response = session.run("appointment_agent", query=query)
-                pass
+            if chat.agent_id == "order_agent":
+                response = session.run("order_agent", query=query)
+                # pass
             elif chat.agent_id == "knowledge_agent":
                 # response = session.run("knowledge_agent", query=query)
                 pass
             else:
+                response = session.run("order_agent", query=query)
                 # response = session.run("multi_agent", query=query)
                 pass
-
+        else:
+            response = "I'm designed to help with order-related tasks and questions about user documents. Unfortunately, I can't assist with your current request. Feel free to ask me something else within those parameters."
+            
     return ChatResponse(bot_message=response)

@@ -1,12 +1,12 @@
 from llama_index.core.agent import ReActAgent
 from llama_index.llms.ollama import Ollama
 from llama_index.core.tools import FunctionTool
-from agent_tool import (
+from .agent_tool import (
     create_order_tool,
     view_orders_tool,
     order_status_tool,
 )
-from agent_template import api_agent_prompt
+from .agent_template import api_agent_prompt
 
 class OrderAgent:
     def __init__(self) -> None:
