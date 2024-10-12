@@ -8,7 +8,7 @@ from utils import (
 )
 from llama_deploy import LlamaDeployClient, ControlPlaneConfig
 
-# client = LlamaDeployClient(ControlPlaneConfig())
+client = LlamaDeployClient(ControlPlaneConfig())
 
 app = FastAPI()
 
@@ -30,29 +30,34 @@ async def upload_documents(
     return {"document_id": doc_id}
 
 
-# @app.post("/chat")
-# async def chat_llama(
-#     chat: Chat,
-#     mobile_id: Annotated[str | None, Header()]
-# ) -> ChatResponse:
+@app.post("/chat")
+async def chat_llama(
+    chat: Chat,
+    mobile_id: Annotated[str | None, Header()]
+) -> ChatResponse:
 
-#     session = client.get_or_create_session(session_id=mobile_id)
+    session = client.get_or_create_session(session_id=mobile_id)
 
-#     query = chat.query
-#     response = session.run("security_layer_agent", query=query)
+    query = chat.query
 
-#     if chat.document_id is not None:
-#         # response, reference = session.run("docs_agent", query=query, document_id=chat.document_id)
-#         return ChatResponse(bot_message=query, reference=query)
+    if chat.document_id is not None:
+        response = session.run("security_layer_agent", query=query)
+        
+        if response == "granted":
+            # response, reference = session.run("docs_agent", query=query, document_id=chat.document_id)
+            return ChatResponse(bot_message=query, reference=query)
+    else:
+        response = session.run("security_layer_agent", query=query)
+        
+        if response == "granted":
+            if chat.agent_id == "appointment_agent":
+                # response = session.run("appointment_agent", query=query)
+                pass
+            elif chat.agent_id == "knowledge_agent":
+                # response = session.run("knowledge_agent", query=query)
+                pass
+            else:
+                # response = session.run("multi_agent", query=query)
+                pass
 
-#     if chat.agent_id == "appointment_agent":
-#         # response = session.run("appointment_agent", query=query)
-#         pass
-#     elif chat.agent_id == "knowledge_agent":
-#         # response = session.run("knowledge_agent", query=query)
-#         pass
-#     else:
-#         # response = session.run("multi_agent", query=query)
-#         pass
-
-#     return ChatResponse(bot_message=response)
+    return ChatResponse(bot_message=response)
