@@ -40,11 +40,6 @@ async def upload_documents(
         ext = ".docx"
     else:
         ext = ".txt"
-    account_url = "https://hackerxdocs.blob.core.windows.net"
-    default_credential = DefaultAzureCredential(
-        # exclude_interactive_browser_credential=False,
-        additionally_allowed_tenants=["a5f0da40-e55f-483b-a42e-a802ecc4db61"],
-    )
     blob_service_client = BlobServiceClient(account_url, credential=default_credential)
 
     container_list = blob_service_client.list_containers()
@@ -62,6 +57,17 @@ async def upload_documents(
     doc_id = blob_id
 
     return {"document_id": doc_id}
+
+
+@app.get("/load_document")
+async def load(
+    doc_id,
+    mobile_id: Annotated[str | None, Header()],
+):
+    blob_service_client = BlobServiceClient(account_url, credential=default_credential)
+    container_client = blob_service_client.get_container_client(mobile_id)
+    file = await container_client.download_blob(doc_id)
+    return {"doc_content": file}
 
 
 # @app.post("/chat")
