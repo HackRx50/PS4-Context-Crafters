@@ -2,7 +2,7 @@ import os
 import json
 from typing import Annotated
 from fastapi import FastAPI, HTTPException, status, Header, UploadFile
-from schema import Chat, ChatResponse
+from schema import Chat, ChatResponse, DocLoad
 from utils import (
     save_and_verify_docs,
 )
@@ -61,12 +61,12 @@ async def upload_documents(
 
 @app.get("/load_document")
 async def load(
-    doc_id,
+    doc_id: DocLoad,
     mobile_id: Annotated[str | None, Header()],
 ):
     blob_service_client = BlobServiceClient(account_url, credential=default_credential)
     container_client = blob_service_client.get_container_client(mobile_id)
-    file = await container_client.download_blob(doc_id)
+    file = await container_client.download_blob(doc_id.doc_id)
     return {"doc_content": file}
 
 
