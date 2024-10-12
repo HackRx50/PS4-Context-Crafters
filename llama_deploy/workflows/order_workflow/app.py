@@ -27,9 +27,11 @@ async def main():
     w = OrderWorkflow(timeout=120, verbose=True)
     # result = await w.run(query="""Create a order for product id "BAIDN31" and the product name is "TITAN watch" """)
     # result = await w.run(query=""" View all the current orders """)
-    result = await w.run(query=""" View the status of the order with order id "7015" """)
+    print("Enter your query:")
+    query = str(input())
+    result = await w.run(query=query) # """ View the status of the order with order id "7015" """
 
-    print(result)
+    print("Below is the output:\n\n", result)
 
 
 if __name__ == "__main__":
