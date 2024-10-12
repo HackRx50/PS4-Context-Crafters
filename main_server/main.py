@@ -36,7 +36,7 @@ async def upload_documents(
         ext = ".txt"
     account_url = "https://hackerxdocs.blob.core.windows.net"
     default_credential = DefaultAzureCredential(
-        exclude_interactive_browser_credential=False,
+        # exclude_interactive_browser_credential=False,
         additionally_allowed_tenants=["a5f0da40-e55f-483b-a42e-a802ecc4db61"],
     )
     blob_service_client = BlobServiceClient(account_url, credential=default_credential)
