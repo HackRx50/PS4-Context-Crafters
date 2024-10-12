@@ -21,7 +21,7 @@ class SecurityWorkflow(Workflow):
         <context>
 
         <case>
-        case 1: The given query from the user should related to booking or cancelling orders and viewing payemnt invoices.
+        case 1:  The given query from the user should related to creating a order using product name, viewing orders using Order Id and order status using order Id .
         Than the response should be:
 
         {"permission":"granted"} 
@@ -29,7 +29,7 @@ class SecurityWorkflow(Workflow):
         </case>
 
         <case>
-        case 2: The given query from the user also can be related to retrieving information about their orders and payment documents or reports.
+        case 2: The given query from the user also can be related to retriving user documents using document id.
         Than the response should be:
 
         {"permission":"granted"} 
@@ -37,7 +37,7 @@ class SecurityWorkflow(Workflow):
         </case>
 
         <case>
-        case 3: If the user tries to query any recommendations, opinion permission should be denied apart from case 1 and case 2.
+        case 3: If the user tries to query about recommendations or opinions permission should be denied.
         Than the response should be:
 
         {"permission":"denied"} 
@@ -66,7 +66,7 @@ class SecurityWorkflow(Workflow):
 
 async def main():
     w = SecurityWorkflow(timeout=60, verbose=False)
-    result = await w.run(query="How can I cancel my order with order Id 123 ?")
+    result = await w.run(query="what is the order?")
     print(result)
 
 
