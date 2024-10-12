@@ -21,7 +21,7 @@ class SecurityWorkflow(Workflow):
         <context>
 
         <case>
-        case 1: The given query from the user should related to booking or cancelling appointments and viewing payemnt invoices.
+        case 1: The given query from the user should related to booking or cancelling orders and viewing payemnt invoices.
         Than the response should be:
 
         {"permission":"granted"} 
@@ -29,7 +29,7 @@ class SecurityWorkflow(Workflow):
         </case>
 
         <case>
-        case 2: The given query from the user also can be realted to retrieving information about their medical, insurance and payment documents or reports.
+        case 2: The given query from the user also can be related to retrieving information about their orders and payment documents or reports.
         Than the response should be:
 
         {"permission":"granted"} 
@@ -66,7 +66,7 @@ class SecurityWorkflow(Workflow):
 
 async def main():
     w = SecurityWorkflow(timeout=60, verbose=False)
-    result = await w.run(query="How can I cancel my upcoming appointment with Dr. Smith?")
+    result = await w.run(query="How can I cancel my order with order Id 123 ?")
     print(result)
 
 
