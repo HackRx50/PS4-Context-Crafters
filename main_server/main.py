@@ -6,26 +6,53 @@ from schema import Chat, ChatResponse
 from utils import (
     save_and_verify_docs,
 )
-from llama_deploy import LlamaDeployClient, ControlPlaneConfig
+
+# from llama_deploy import LlamaDeployClient, ControlPlaneConfig
+from azure.identity import DefaultAzureCredential
+from azure.storage.blob import BlobServiceClient
+import uuid
+
 
 # client = LlamaDeployClient(ControlPlaneConfig())
 
 app = FastAPI()
 
+
 @app.post("/upload_document")
 async def upload_documents(
     file: UploadFile,
-    mobile_id: Annotated[str | None , Header()],
+    mobile_id: Annotated[str | None, Header()],
 ):
-
     file_name = file.filename
     file_content_type = file.content_type
     content = await file.read()
-
-    # Replace cloud storage with below function
-    doc_id = save_and_verify_docs(
-        file_content_type=file_content_type, file_name=file_name, file_content=content
+    if file_content_type == "pdf":
+        ext = ".pdf"
+    elif file_content_type == "json":
+        ext = ".json"
+    elif file_content_type == "docx":
+        ext = ".docx"
+    else:
+        ext = ".txt"
+    account_url = "https://hackerxdocs.blob.core.windows.net"
+    default_credential = DefaultAzureCredential(
+        exclude_interactive_browser_credential=False
     )
+    blob_service_client = BlobServiceClient(account_url, credential=default_credential)
+
+    container_list = blob_service_client.list_containers()
+    if mobile_id not in container_list:
+        container_client = blob_service_client.create_container(mobile_id)
+
+    blob_id = str(uuid.uuid4()) + ext
+    blob_client = blob_service_client.get_blob_client(container=mobile_id, blob=blob_id)
+
+    blob_client.upload_blob(content)
+    # Replace cloud storage with below function
+    # doc_id = save_and_verify_docs(
+    #     file_content_type=file_content_type, file_name=file_name, file_content=content
+    # )
+    doc_id = blob_id
 
     return {"document_id": doc_id}
 
