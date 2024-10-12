@@ -66,7 +66,7 @@ async def load(
 ):
     blob_service_client = BlobServiceClient(account_url, credential=default_credential)
     container_client = blob_service_client.get_container_client(mobile_id)
-    file = await container_client.download_blob(doc_id.doc_id)
+    file = await json.loads(container_client.download_blob(doc_id.doc_id).readall())
     return {"doc_content": file}
 
 
