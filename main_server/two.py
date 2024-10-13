@@ -1,6 +1,7 @@
 from pathlib import Path
 from huggingface_hub.file_download import uuid
 import llama_index
+from llama_index.core.ingestion import IngestionPipeline
 from llama_index.llms.ollama import Ollama
 from llama_index.core import (
     VectorStoreIndex,
@@ -32,6 +33,7 @@ def load_doc(mobile: str, doc_loc: str):
         )
 
     parent_vdb = QdrantVectorStore(collection_name=mobile)
+    parent_context = StorageContext.from_defaults(vector_store=parent_vdb)
     doc_id = uuid.uuid4()
     collection_name = mobile + "_" + str(doc_id)
     client.create_collection(
@@ -39,6 +41,40 @@ def load_doc(mobile: str, doc_loc: str):
         vectors_config=VectorParams(distance=Distance.DOT, size=384),
     )
     child_vdb = QdrantVectorStore(collection_name=collection_name)
+    child_context = StorageContext.from_defaults(vector_store=child_vdb)
 
     docs = FlatReader().load_data(Path(doc_loc))
     nodes = SimpleFileNodeParser().get_nodes_from_documents(docs)
+    pipeline = IngestionPipeline(transformations=[embed_model])
+    nodes = pipeline.run(nodes)
+
+    VectorStoreIndex(nodes, storage_context=parent_context)
+    VectorStoreIndex(nodes, storage_context=child_context)
+
+    return str(doc_id)
+
+
+# def query(query: str, mobile:str, doc_id:str):
+def query(*args):
+    if len(args) == 2:
+        query, mobile = args
+        collection_name = mobile
+    else:
+        query, mobile, doc_id = args
+        collection_name = mobile + "_" + doc_id
+
+    vector_store = QdrantVectorStore(collection_name=collection_name)
+    index = VectorStoreIndex.from_vector_store(vector_store=vector_store)
+    query_engine = index.as_query_engine(llm, response_mode="refined")
+    response = query_engine.query(query)
+
+    return response
+
+
+# def query(query:str, mobile:str):
+#     vector_store = QdrantVectorStore(collection_name=mobile)
+#     index = VectorStoreIndex.from_vector_store(vector_store=vector_store)
+#     query_engine = index.as_query_engine(llm, response_mode="refined")
+#     response = query_engine.query(query)
+
+#     return response
